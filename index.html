@@ -5,12 +5,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Choisohyeon</title>
     <link rel="stylesheet" href="css/mario.css">
-    
+    <style>
+        #loading-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            text-align: center;
+            line-height: 100vh;
+            font-size: 2em;
+        }
+        #section2 {
+            display: none; /* 섹션2는 기본적으로 숨겨짐 */
+        }
+        .coin {
+            position: absolute;
+            width: 50px;
+            animation: coin-animation 1s forwards;
+        }
+        @keyframes coin-animation {
+            0% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px);
+                opacity: 0;
+            }
+        }
+        .imgbox {
+            display: none;
+            position: absolute;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+    </style>
 </head>
 <body>
     <section>
         <div id="section1">
-           <ul class="top_menu">
+            <ul class="top_menu">
                 <li>sohyeon X 1</li>
                 <li class="coin_box">
                     <figure><img src="img/coin.png" alt=""> X 27</figure>
@@ -18,172 +57,83 @@
                 <li class="reset"><a href="#">처음으로</a></li>
             </ul>
             <ul id="typing-effect"> </ul>
-             <ul class="title">
+            <ul class="title">
                 <li>SOHYEON<br>
                     PORTFOLIO
                     <p>Insertcoin</p>
-                                        
                 </li>
                 <li class="before">SOHYEON<br>
                     PORTFOLIO
-                 </li>
-             </ul>
-             <ul id="container">
+                </li>
+            </ul>
+            <div id="container">
                 <img id="move" src="img/mario.png" alt="">
-                <!-- Obstacle -->
-                <div class="obstacle" id="obstacle"></div>
-            </ul>  
+                <!-- 장애물 -->
+                <div class="obstacle" id="obstacle">
+                    <img src="img/pipe.png" alt="">
+                </div>
+            </div>
+
+            <div class="cloud_box">
+                <figure class="first">
+                    <img src="img/cloud1.png" alt="">
+                </figure>
+                <figure class="last">
+                    <img src="img/cloud2.png" alt="">
+                </figure>
+            </div>
         </div>
-        
-        <div class="cloud_box">
-            <figure class="first">
-                <img src="img/cloud1.png" alt="">
-            </figure>
-            <figure class="last">
-                <img src="img/cloud2.png" alt="">
-            </figure>
-      
+
+        <div id="section2">
+            <ul class="top_menu">
+                <li>sohyeon X 1</li>
+                <li class="coin_box">
+                    <figure><img src="img/coin.png" alt=""> X 27</figure>
+                </li>
+                <li class="reset"><a href="#">처음으로</a></li>
+            </ul>
+            <ul id="typing-effect"> </ul>
+            <ul class="title">
+                <li>SOHYEON<br>
+                    PORTFOLIO
+                    <p>Insertcoin</p>
+                </li>
+                <li class="before">SOHYEON<br>
+                    PORTFOLIO
+                </li>
+            </ul>
+            <div id="container2">
+                <img id="move" src="img/mario.png" alt="">
+                <!-- 장애물 -->
+                <div class="obstacle obstacle21" id="obstacle21">
+                    <img src="img/pipe.png" alt="">
+                </div>
+                <div class="obstacle22" id="obstacle22">
+                    <p>1</p>
+                    <p></p>
+                    <p></p>
+                    <p></p>
+                </div>
+            </div>
+
+            <div class="cloud_box">
+                <figure class="first">
+                    <img src="img/cloud1.png" alt="">
+                </figure>
+                <figure class="last">
+                    <img src="img/cloud2.png" alt="">
+                </figure>
+            </div>
         </div>
-   
+
+
+
+        <!-- Loading Screen -->
+        <div id="loading-screen">Loading...</div>
     </section>
     <script src="script/jquery-3.7.1.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="script/action.js"></script>
     
-    <script>
-    $(document).ready(function() {
-    // 오디오 객체 생성
-    const coinSound = new Audio('audio/coin.mp3'); // coin.mp3 경로를 정확히 지정하세요
-    const jumpSound = new Audio('audio/jump.mp3'); // jump.mp3 경로를 정확히 지정하세요
-    const marioSound = new Audio('audio/mario_theme.mp3'); // jump.mp3 경로를 정확히 지정하세요
-
-
-    setTimeout(function(){
-        marioSound.play()
-    },1000)
-
-    $('.title p').click(function() {
-        $('.title').fadeOut();
-        $('.cloud_box').css('background-image', 'url(img/light2.png)');
-        $('#container').show();
-        // coin.mp3 재생
-        coinSound.play();
-    });
-
-    $('.reset').click(function() {
-        $('.cloud_box').css('background-image', 'url(img/light1.png)');
-        $('.title').fadeIn();
-        $('#container').hide();
-    });
-
-    let character = $('#move');
-    let container = $('#container');
-    let obstacle = $('#container .obstacle'); // 장애물 참조
-    let containerWidth = container.width();
-    let characterWidth = character.width();
-    let obstacleWidth = obstacle.width();
-    let position = 0;
-    let isJumping = false;
-    let onObstacle = false; // 캐릭터가 장애물 위에 있는지 여부
-    let movementInterval;
-    let direction = 1; // 1: 오른쪽, -1: 왼쪽
-
-
-    $(document).keydown(function(e) {
-        switch(e.which) {
-            case 37: // 왼쪽 화살표
-                direction = -1;
-                character.css('transform', 'scaleX(-1)');
-                startMoving();
-                break;
-            case 39: // 오른쪽 화살표
-                direction = 1;
-                character.css('transform', 'scaleX(1)');
-                startMoving();
-                break;
-            case 32: // 스페이스바
-                if (!isJumping) {
-                    isJumping = true;
-                    jump();
-
-                    // jump.mp3 재생
-                    jumpSound.play();
-                }
-                break;
-        }
-    });
-
-    $(document).keyup(function(e) {
-        if (e.which === 37 || e.which === 39) {
-            stopMoving();
-        }
-    });
-
-    function startMoving() {
-        if (!movementInterval) {
-            movementInterval = setInterval(moveCharacter, 50);
-        }
-    }
-
-    function stopMoving() {
-        clearInterval(movementInterval);
-        movementInterval = null;
-    }
-
-    function moveCharacter() {
-        let obstaclePosition = obstacle.position().left;
-        position += direction * 10;
-
-        // 장애물과의 충돌 감지 및 점프 중인 경우는 예외 처리
-        if (!isJumping) {
-            if (direction === 1 && position + characterWidth > obstaclePosition && position < obstaclePosition + obstacleWidth) {
-                // 오른쪽 방향 이동 중 장애물에 충돌할 때
-                position = Math.min(position, obstaclePosition - characterWidth);
-            } else if (direction === -1 && position < obstaclePosition + obstacleWidth && position + characterWidth > obstaclePosition) {
-                // 왼쪽 방향 이동 중 장애물에 충돌할 때
-                position = Math.max(position, obstaclePosition + obstacleWidth);
-            }
-        }
-
-        // 캐릭터가 장애물 위에 있고, 장애물의 범위를 벗어나면 아래로 떨어지게 처리
-        if (onObstacle && (position + characterWidth < obstaclePosition || position > obstaclePosition + obstacleWidth)) {
-            // 장애물 위에서 벗어난 경우
-            character.animate({ bottom: '0px' }, 200, function() {
-                onObstacle = false; // 장애물 위에 있지 않음
-                isJumping = false; // 점프 상태 초기화
-            });
-        }
-
-        // 캐릭터가 컨테이너의 경계 내에 있도록 보장
-        position = Math.max(0, Math.min(containerWidth - characterWidth, position));
-        character.css('left', position + 'px');
-    }
-
-    function jump() {
-        let jumpHeight = 180;
-        let jumpDuration = 800;
-
-        let obstaclePosition = obstacle.position().left;
-        let obstacleTop = obstacle.offset().top;
-        let obstacleHeight = obstacle.height();
-        let characterBottom = parseInt(character.css('bottom'), 10);
-
-        character.animate({bottom: jumpHeight}, jumpDuration / 2, function() {
-            // 점프 중에 캐릭터가 장애물의 범위 내에 있는지 확인
-            if (position + characterWidth > obstaclePosition && position < obstaclePosition + obstacleWidth) {
-                // 장애물 위에 착지
-                character.css('bottom', obstacleHeight + 'px');
-                onObstacle = true; // 캐릭터가 장애물 위에 있음 표시
-            } else {
-                // 장애물 위가 아닌 경우 원래 위치로 내려오기
-                character.animate({bottom: 0}, jumpDuration / 2, function() {
-                    isJumping = false;
-                });
-            }
-        });
-    }
-});
-
-    
-        </script>
 </body>
 </html>
