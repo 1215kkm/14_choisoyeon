@@ -4,42 +4,135 @@
 @import url(reset.css);
 @import url(var.css);
 
-#section1{width: 100%;height: 900px;position: relative;overflow: hidden;background: url(../img/scene1.png) no-repeat;}
-    
-.top_menu{display: flex;width: 90%;margin: 0 auto;justify-content: space-between;font-size: 48px;align-items: center;color: #fff;padding-top: 30px;}
+#section1 {
+    width: 100%;
+    height: 900px;
+    position: relative;
+    overflow: hidden;
+    background: url(../img/scene1.png) no-repeat;
+}
 
-.top_menu li{width: 20%;display: flex;align-items: center;justify-content: center;}
-.top_menu li a{color: #fff;}
-.top_menu li figure{width: auto;height: 40px;display: flex;align-items: center;justify-content: center;gap: 10px ;}
-.top_menu figure img{height: 100%;}
-.cloud_box{display: flex;;position: absolute;top: 0;left: 0;width: 100%;height: 100vh;z-index: -1;overflow: hidden;}
-.cloud_box .first{position: absolute;;animation: moveto 6s infinite linear; transition: right 0.5s ease;z-index: 0}
+#section2 {
+    width: 100%;
+    height: 900px;
+    position: relative;
+    overflow: hidden;
+    display: none;
+    background: url(../img/scene2.png) no-repeat;
+}
+
+#section3 {
+    width: 100%;
+    height: 900px;
+    position: relative;
+    overflow: hidden;
+    display: none;
+    background: url(../img/scene3.png) no-repeat;
+}
+
+.top_menu {
+    display: flex;
+    width: 90%;
+    margin: 0 auto;
+    justify-content: space-between;
+    font-size: 48px;
+    align-items: center;
+    color: #fff;
+    padding-top: 30px;
+}
+
+.top_menu li {
+    width: 20%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.top_menu li a {
+    color: #fff;
+}
+.top_menu li figure {
+    width: auto;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+.top_menu figure img {
+    height: 100%;
+}
+.cloud_box {
+    display: flex;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: -1;
+    overflow: hidden;
+}
+.cloud_box .first {
+    position: absolute;
+    animation: moveto 6s infinite linear;
+    transition: right 0.5s ease;
+    z-index: 0;
+}
 @keyframes moveto {
-  
-    0% {right: 30%; top:-5% ; }
-    50% {right: 50%;top:-5% ; }
-    100% {right: 70%;top:-5% ; }   
+    0% {right: 30%; top: -5%;}
+    50% {right: 50%; top: -5%;}
+    100% {right: 70%; top: -5%;}
 }
-.cloud_box .last{position: absolute;;animation: moveto2 6s infinite linear; transition: right 0.5s ease;z-index: 0; }
+.cloud_box .last {
+    position: absolute;
+    animation: moveto2 6s infinite linear;
+    transition: right 0.5s ease;
+    z-index: 0;
+}
 @keyframes moveto2 {
-    0% {left: 0;top:0% ; }
-    50% {left: 30%;top:0% ; }
-    100% {left: 50%; top:0% ;}      
+    0% {left: 0; top: 0%;}
+    50% {left: 30%; top: 0%;}
+    100% {left: 50%; top: 0%;}
 }
 
-.title{font-size: 120px;text-align: center;width: 100%;height: 50vh;display: flex;align-items: center;justify-content: center;;z-index: 1;font-family:'DNFBitBitv2';color: #191E46;}
-.title p{font-size: 60px;font-family: 'DungGeunMo';color: #fff;animation: fade-inout 6s infinite;cursor: pointer;}
+.title {
+    font-size: 120px;
+    text-align: center;
+    width: 100%;
+    height: 50vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+    font-family: 'DNFBitBitv2';
+    color: #191E46;
+}
+.title p {
+    font-size: 60px;
+    font-family: 'DungGeunMo';
+    color: #fff;
+    animation: fade-inout 6s infinite;
+    cursor: pointer;
+}
 @keyframes fade-inout {
     0% {opacity: 0;}
     33% {opacity: 0.5;}
     66% {opacity: 1;}
     99% {opacity: 1;}
     100% {opacity: 0;}
-    
 }
-.before{position: absolute;z-index: 1;top: 30% ;left: 49.5%;transform: translate(-50% ,-50%);color:#fff;}
 
-#container {
+.before {
+    position: absolute;
+    z-index: 1;
+    top: 30%;
+    left: 49.5%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+}
+
+#container,
+#container2,
+#container3 {
     position: absolute;
     bottom: 55px;
     width: 60vw;
@@ -49,16 +142,7 @@
     display: none;
     width: 100%;
 }
-#container2 {
-    position: absolute;
-    bottom: 55px;
-    width: 60vw;
-    height: 50vh;
-    overflow: hidden;
-    margin: 0 auto;
-    display: none;
-    width: 100%;
-}
+
 #move {
     position: absolute;
     bottom: 0;
@@ -67,6 +151,7 @@
     width: 90px;
     transition: transform 0.1s;
 }
+
 .obstacle {
     position: absolute;
     bottom: 10px;
@@ -75,9 +160,41 @@
     left: 1400px;
     border: 1px solid #000;
 }
-.obstacle img {width: 100%;}
+.obstacle img {
+    width: 100%;
+}
 
-#section2{width: 100%;height: 900px;position: relative;overflow: hidden;background: url(../img/scene2.png) no-repeat;}
-#section2 .obstacle22 {width: 400px; height: 100px; position: absolute; left: 430px; top: 40px; display: flex; z-index: 300; background: url('../img/questionbox.png') no-repeat;}
-#section2 .obstacle22 p {width: 100px; height: 100px; border: 1px solid #000; ;}
-#section2 .obstacle22 p:nth-child(3) {background: red;}
+#section2 .obstacle22 {
+    width: 400px;
+    height: 100px;
+    position: absolute;
+    left: 430px;
+    top: 40px;
+    display: flex;
+    z-index: 300;
+    background: url('../img/questionbox.png') no-repeat;
+}
+#section2 .obstacle22 p {
+    width: 100px;
+    height: 100px;
+    border: 1px solid #000;
+}
+#section2 .obstacle22 p:nth-child(3) {
+    background: red;
+}
+
+/* 섹션 3의 계단 스타일 */
+.stairs {
+    position: absolute;
+    left: 400px; /* 계단의 시작 위치 */
+    bottom: 0;
+    display: flex;
+    flex-direction: column-reverse; /* 아래에서 위로 쌓이도록 설정 */
+}
+.stair {
+    width: 100px;
+    height: 100px;
+    background: #8B4513;
+    border: 1px solid #000;
+    margin-bottom: -1px; /* 계단이 겹치지 않도록 마진 설정 */
+}

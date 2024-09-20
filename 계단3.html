@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>캐릭터 움직임 게임</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #87CEEB; /* 하늘색 배경 */
+        }
+        .game-area {
+            position: relative;
+            width: 800px;
+            height: 600px;
+            border: 2px solid #000;
+            background-color: #87CEEB;
+            margin: 20px auto;
+            overflow: hidden;
+        }
+        .character {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background-color: red;
+            left: 50px;
+            bottom: 0;
+            transition: left 0.1s, transform 0.2s; /* 좌우 이동 및 회전 애니메이션 */
+        }
+        .stairs {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background-color: gray;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-area" id="gameArea">
+        <div class="character" id="character"></div>
+        <!-- 5단의 계단 배치 -->
+        <div class="stairs" style="left: 200px; bottom: 0;"></div>
+        <div class="stairs" style="left: 300px; bottom: 100px;"></div>
+        <div class="stairs" style="left: 400px; bottom: 200px;"></div>
+        <div class="stairs" style="left: 500px; bottom: 300px;"></div>
+        <div class="stairs" style="left: 600px; bottom: 400px;"></div>
+    </div>
+
+    <!-- jQuery 라이브러리 -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            var $character = $('#character');
+            var $gameArea = $('#gameArea');
+            var $stairs = $('.stairs');
+
+            var character = {
+                x: 50,
+                y: 0,
+                width: 50,
+                height: 50,
+                velocityY: 0,
+                isJumping: false,
+                speed: 5,
+                gravity: 1.5,
+                maxFallSpeed: 10, // 낙하 속도 최대치
+                jumpStrength: 20,
+                facingRight: true // 캐릭터의 바라보는 방향 상태 추가 (true = 우측)
+            };
+
+            var keys = {
+                left: false,
+                right: false,
+                up: false
+            };
+
+            // 계단 데이터 저장
+            var stairs = [];
+            $stairs.each(function() {
+                var $this = $(this);
+                stairs.push({
+                    x: parseInt($this.css('left')),
+                    y: parseInt($this.css('bottom')),
+                    width: $this.width(),
+                    height: $this.height()
+                });
+            });
+
+            // 키보드 입력 처리
+            $(document).keydown(function(e) {
+                switch(e.key) {
+                    case "ArrowLeft":
+                        keys.left = true;
+                        break;
+                    case "ArrowRight":
+                        keys.right = true;
+                        break;
+                    case " ":
+                        keys.up = true;
+                        break;
+                }
+            });
+
+            $(document).keyup(function(e) {
+                switch(e.key) {
+                    case "ArrowLeft":
+                        keys.left = false;
+                        break;
+                    case "ArrowRight":
+                        keys.right = false;
+                        break;
+                    case " ":
+                        keys.up = false;
+                        break;
+                }
+            });
+
+            // 충돌 감지 함수
+            function checkCollision(newX, newY) {
+                var collision = false;
+
+                // 게임 영역 경계 체크
+                if (newX < 0 || newX + character.width > $gameArea.width()) {
+                    return true;
+                }
+
+                // 각 계단과의 충돌 체크
+                stairs.forEach(function(stair) {
+                    // 캐릭터가 계단과 충돌했는지 확인 (캐릭터가 계단 벽에 닿으면 멈춤)
+                    if (newX + character.width > stair.x && newX < stair.x + stair.width &&
+                        newY < stair.y + stair.height && newY + character.height > stair.y) {
+                        collision = true;
+                    }
+                });
+
+                return collision;
+            }
+
+            // 캐릭터가 계단 위에 있는지 확인
+            function onStair(newY) {
+                var onStair = false;
+                stairs.forEach(function(stair) {
+                    // 캐릭터가 계단 위에 서 있는지 확인 (낙하 시 계단 위에서 멈추도록)
+                    if (character.x + character.width > stair.x &&
+                        character.x < stair.x + stair.width &&
+                        newY === stair.y + stair.height) {
+                        onStair = true;
+                    }
+                });
+                return onStair;
+            }
+
+            // 계단 아래로의 충돌 감지
+            function hitStairBelow(newX, newY) {
+                var hit = false;
+                stairs.forEach(function(stair) {
+                    // 캐릭터가 계단 아래로 내려가는 동안 계단과 충돌했는지 확인
+                    if (character.x + character.width > stair.x &&
+                        character.x < stair.x + stair.width &&
+                        character.y >= stair.y + stair.height &&
+                        newY <= stair.y + stair.height) {
+                        hit = true;
+                        character.y = stair.y + stair.height; // 계단 위에 멈춤
+                        character.velocityY = 0; // 낙하 멈춤
+                        character.isJumping = false; // 점프 상태 종료
+                    }
+                });
+                return hit;
+            }
+
+            // 게임 루프
+            function gameLoop() {
+                var newX = character.x;
+                var newY = character.y;
+
+                // 좌우 이동
+                if (keys.left) {
+                    newX = character.x - character.speed;
+                    // 충돌 감지 후 이동
+                    if (!checkCollision(newX, character.y)) {
+                        character.x = newX;
+                    }
+                    // 캐릭터가 왼쪽을 보도록 설정
+                    if (character.facingRight) {
+                        $character.css('transform', 'scaleX(-1)');
+                        character.facingRight = false;
+                    }
+                }
+                if (keys.right) {
+                    newX = character.x + character.speed;
+                    // 충돌 감지 후 이동
+                    if (!checkCollision(newX, character.y)) {
+                        character.x = newX;
+                    }
+                    // 캐릭터가 오른쪽을 보도록 설정
+                    if (!character.facingRight) {
+                        $character.css('transform', 'scaleX(1)');
+                        character.facingRight = true;
+                    }
+                }
+
+                // 점프 처리
+                if (keys.up && !character.isJumping) {
+                    if (character.y === 0 || onStair(character.y)) {
+                        character.isJumping = true;
+                        character.velocityY = character.jumpStrength;
+                    }
+                }
+
+                // 중력 적용 및 낙하 속도 처리
+                if (character.isJumping) {
+                    newY = character.y + character.velocityY;
+                    character.velocityY -= character.gravity;
+
+                    // 최고점 도달 후 하강
+                    if (newY <= 0) {
+                        newY = 0;
+                        character.isJumping = false;
+                        character.velocityY = 0;
+                    }
+
+                    // 계단과의 충돌 체크
+                    stairs.forEach(function(stair) {
+                        if (character.x + character.width > stair.x &&
+                            character.x < stair.x + stair.width &&
+                            newY <= stair.y + stair.height &&
+                            character.y >= stair.y + stair.height) {
+                            newY = stair.y + stair.height;
+                            character.isJumping = false;
+                            character.velocityY = 0;
+                        }
+                    });
+
+                    character.y = newY;
+                } else {
+                    // 바닥이나 계단 위에 서 있는지 확인
+                    if (!onStair(newY) && character.y > 0) {
+                        // 중력에 의해 떨어짐, 낙하 속도 최대치를 적용하여 속도가 일정하게 유지되도록 함
+                        character.velocityY = Math.min(character.velocityY + character.gravity, character.maxFallSpeed);
+                        newY = character.y - character.velocityY;
+
+                        // 계단 아래에 충돌했는지 확인
+                        if (hitStairBelow(newX, newY)) {
+                            newY = character.y; // 충돌했을 때 계단 위에 멈춤
+                        } else {
+                            character.y = newY; // 충돌하지 않으면 계속 낙하
+                        }
+
+                        if (character.y < 0) character.y = 0; // 바닥에 닿았을 때
+                    } else {
+                        character.velocityY = 0; // 계단 위에 있을 때 속도 초기화
+                    }
+                }
+
+                // 화면에 캐릭터 위치 업데이트
+                $character.css({
+                    left: character.x + 'px',
+                    bottom: character.y + 'px'
+                });
+
+                requestAnimationFrame(gameLoop);
+            }
+
+            // 게임 시작
+            gameLoop();
+        });
+    </script>
+</body>
+</html>
